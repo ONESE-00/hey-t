@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export OPENAI_API_KEY=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
+
 # Default mode
 MODE_Q_V="verbose"
 TEXT_ARG=""
