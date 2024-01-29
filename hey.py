@@ -1,8 +1,3 @@
-'''
-UNAME =hey_admin
-PWD = hey_uiop58
-'''
-
 import os
 import sys
 #import urllib3
