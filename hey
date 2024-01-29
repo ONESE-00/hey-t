@@ -1,10 +1,11 @@
 #!/bin/bash
 
-export OPENAI_API_KEY=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
+# export OPENAI_API_KEY=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
 
 # Default mode
 MODE_Q_V="verbose"
 TEXT_ARG=""
+PWD=$(pwd)
 
 # Function to print help
 print_help() {
@@ -64,4 +65,4 @@ while true; do
 done
 
 #INCLUDE THE PYTHON SCRIPT
-python /home/onese/Desktop/PROJO/VOICE_24/hey.py "$MODE_Q_V" "$MODE" "$TEXT_ARG"
+python /home/onese/Desktop/PROJO/VOICE_24/hey.py "$PWD" "$MODE_Q_V" "$MODE" "$TEXT_ARG"

@@ -1,42 +1,33 @@
 '''
-KEEP IT SIMPLE TO TEST THE PIPELINE.
-1. Record
-2. Transcribe
-3. Parse to GPT AI
-4. PRINT COMMAND GIVEN BY AI
-
 UNAME =hey_admin
 PWD = hey_uiop58
 '''
+
 import os
 import sys
+#import urllib3
+import warnings
 import speech_recognition as sr 
 from colorama import Fore, Style
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from openai  import OpenAI
 
+#urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+#urllib3.disable_warnings(urllib3.exceptions.SSLError)
+warnings.filterwarnings("ignore")
+
 #getting the command line options and arguments from the bash 
-mode_q_v = sys.argv[1] if len(sys.argv) > 1 else None
-mode_t    = sys.argv[2] if len(sys.argv) > 2 else None
-text_arg = sys.argv[3] if len(sys.argv) > 3 else None
+pwd         = sys.argv[1] if len(sys.argv) > 1 else None
+mode_q_v    = sys.argv[2] if len(sys.argv) > 2 else None
+mode_t      = sys.argv[3] if len(sys.argv) > 3 else "voice"
+text_arg    = sys.argv[4] if len(sys.argv) > 4 else None
 
 
 #set the api key
-#client = OpenAI(    api_key = os.environ.get("OPENAI_API_KEY")  )
+client = OpenAI(    api_key = os.environ.get("OPENAI_API_KEY")  )
 
-client = Elasticsearch(
-  "https://10.8.185.120:9200/",
-  #api_key="uV95z8ouTJWYgW4N-jzdAQ",
-  verify_certs=False,
-  ssl_show_warn=False,
-  http_auth=("elastic", "0X=+wWfc5F1gHZ3++K8c"),
 
-)
-
-print(client.info())
-
-'''
 #Record and transcribe Audio
 def rec_transcribe():
     recognizer = sr.Recognizer()
@@ -94,8 +85,7 @@ def parse2ai():
         temperature=0.5,
         model="gpt-3.5-turbo",
     )
-        command = chat_completion.choices[0].message.content
-        return (f"{Fore.GREEN}{command}{Style.RESET_ALL}")
+        return chat_completion.choices[0].message.content
     
     except OpenAI.Error as e:
         # Handle OpenAI API errors
@@ -107,19 +97,38 @@ def parse2ai():
         print(f"Unexpected error: {e}")
         return ""
 
+def update_db():
+        # Elasticsearch connection
+    es = Elasticsearch(['https://localhost:9200/'], http_auth=('elastic', '0X=+wWfc5F1gHZ3++K8c'), verify_certs=False)
+    index_name = 'hey_logs'
+    document = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "working_directory": pwd,
+        "mode": mode_q_v,
+        "input_format": mode_t,
+        "query": transcribed_text,
+        "api_response": command
+    }
+    push_to_db = es.index(index=index_name, document=document)
+
+    return push_to_db
+
+
 
 #calling the functions
 
 #HANDLING VOICE OR TEXT INPUT
-if mode_t:
-    #WHEN THE TEXT MODE IS ON
+if mode_t == "text":
+    #WHEN THE TEXT MODE I,S ON
+    user_input = text_arg
     transcribed_text = text_arg
 
-else:
+elif mode_t == "voice":
     #WHEN THE TEXT MODE IS OFF
     transcribed_text = rec_transcribe()
 
 
 #print command
-print("\n",parse2ai())
-'''
+command = parse2ai()
+print("\n",(f"{Fore.GREEN}{command}{Style.RESET_ALL}"))
+update_db()
