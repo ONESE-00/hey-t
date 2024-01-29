@@ -1,6 +1,5 @@
 import os
 import sys
-#import urllib3
 import warnings
 import speech_recognition as sr 
 from colorama import Fore, Style
@@ -8,8 +7,6 @@ from datetime import datetime
 from elasticsearch import Elasticsearch
 from openai  import OpenAI
 
-#urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-#urllib3.disable_warnings(urllib3.exceptions.SSLError)
 warnings.filterwarnings("ignore")
 
 #getting the command line options and arguments from the bash 
@@ -17,7 +14,6 @@ pwd         = sys.argv[1] if len(sys.argv) > 1 else None
 mode_q_v    = sys.argv[2] if len(sys.argv) > 2 else None
 mode_t      = sys.argv[3] if len(sys.argv) > 3 else "voice"
 text_arg    = sys.argv[4] if len(sys.argv) > 4 else None
-
 
 #set the api key
 client = OpenAI(    api_key = os.environ.get("OPENAI_API_KEY")  )
@@ -94,7 +90,7 @@ def parse2ai():
 
 def update_db():
         # Elasticsearch connection
-    es = Elasticsearch(['https://localhost:9200/'], http_auth=('elastic', '0X=+wWfc5F1gHZ3++K8c'), verify_certs=False)
+    es = Elasticsearch(['https://localhost:9200/'], http_auth=(os.environ.get("ELASTIC_UNAME"),os.environ.get("ELASTIC_PWD")), verify_certs=False)
     index_name = 'hey_logs'
     document = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),

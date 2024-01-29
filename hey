@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# export OPENAI_API_KEY=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
+export OPENAI_API_KEY=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
+export ELASTIC_UNAME=elastic
+export ELASTIC_PWD=0X=+wWfc5F1gHZ3++K8c
 
 # Default mode
 MODE_Q_V="verbose"
